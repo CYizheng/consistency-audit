@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+report.md
+report.json
+report.html
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

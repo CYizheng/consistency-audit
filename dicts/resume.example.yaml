@@ -1,0 +1,121 @@
+# 口径字典示例：求职材料
+#
+# 这份字典声明「哪些字段必须跨文件一致」，以及「允许的格式」。
+# 换成你自己的材料时，改这里即可，不用动代码。
+#
+# 字段说明：
+#   key       唯一标识，报告里用它做机器可读的定位
+#   name      人话名字，报告里显示这个
+#   aliases   同一字段在真实材料里的各种写法（越长越优先匹配）
+#   pattern   归一化之后必须匹配的正则；不填则不校验
+#   normalize compact | date_month | date_day | org | text
+#   severity  high | medium | low —— 冲突时报告成什么级别
+#   required  这份材料集里是否必须出现（缺了会单独报一条）
+#   note      口径备注，报告里会附在问题下面
+
+name: 求职材料通用口径字典（示例）
+
+fields:
+  - key: full_name
+    name: 姓名
+    aliases: [姓名, 姓名全称]
+    normalize: text
+    severity: high
+    required: true
+    max_len: 6
+    negatives: [校（院）长, 校长, 院长, 父亲, 母亲, 配偶, 曾用名, 签发人]
+    note: 设了长度上限，超过 6 个字一律丢弃——表格里「姓名」右边常常是「关系」「年龄」这类表头，靠长度就能挡掉大部分。negatives 用来排除「校（院）长姓名」这类属于别人的姓名字段（学历备案表上就有签发人姓名）。
+
+  - key: phone
+    name: 手机号
+    aliases: [手机号码, 移动电话, 联系电话, 手机号, 电话, 手机]
+    pattern: '^1[3-9]\d{9}$'
+    normalize: compact
+    severity: high
+    required: true
+    note: 归一化会去掉空格与短横线，所以 138-0000-0000 与 13800000000 视为同一个值。
+
+  - key: email
+    name: 邮箱
+    aliases: [电子邮箱, 邮箱地址, 邮箱, E-mail, Email]
+    pattern: '^[\w.+-]+@[\w-]+\.[\w.-]+$'
+    normalize: text
+    severity: medium
+
+  - key: id_card
+    name: 身份证号
+    aliases: [身份证号码, 身份证号, 公民身份号码]
+    pattern: '^\d{17}[\dXx]$'
+    normalize: compact
+    severity: high
+    note: 归一化只做全角转半角与去空白，不做校验位推算——校验位该不该由工具改，需要人决定。
+
+  - key: birth_month
+    name: 出生年月
+    aliases: [出生年月, 出生日期, 生日]
+    pattern: '^\d{4}-\d{2}$'
+    normalize: date_month
+    severity: high
+
+  - key: grad_date
+    name: 毕业时间
+    aliases: [预计毕业时间, 毕业时间, 毕业年月, 毕业日期]
+    pattern: '^\d{4}-\d{2}$'
+    normalize: date_month
+    severity: high
+    required: true
+
+  - key: undergrad_school
+    name: 本科院校
+    aliases: [本科毕业院校, 本科院校, 本科学校, 本科就读院校]
+    normalize: org
+    severity: high
+
+  - key: undergrad_major
+    name: 本科专业
+    aliases: [本科所学专业, 本科专业名称, 本科专业]
+    normalize: text
+    severity: high
+    note: 专业名称必须与毕业证、学信网报告逐字一致。写简称或近义名（如把「信息资源管理」写成「信息管理与信息系统」）在政审与档案核验时会被判为不符。
+
+  - key: master_school
+    name: 硕士院校
+    aliases: [硕士毕业院校, 硕士院校, 研究生院校, 硕士就读院校]
+    normalize: org
+    severity: medium
+
+  - key: master_major
+    name: 硕士专业
+    aliases: [硕士所学专业, 硕士专业名称, 研究生专业, 硕士专业]
+    normalize: text
+    severity: high
+
+  - key: soft_copyright_id
+    name: 软著登记号
+    aliases: [软件著作权登记号, 软著登记号, 著作权登记号, 登记号]
+    pattern: '^\d{4}SR\d{7}$'
+    normalize: compact
+    severity: high
+    note: 形如 2024SR1234567：4 位年份 + SR + 7 位流水号。这里最容易出现数字转置，而转置后的两串字符组成完全相同、普通模糊匹配会漏掉，必须靠字符重排判据。
+
+  - key: soft_copyright_name
+    name: 软著名称
+    aliases: [软件著作权名称, 软著名称, 软件名称]
+    normalize: text
+    severity: medium
+    note: 登记证书上的名称带版本号（如「……系统 V1.0」），简历里常被省略。删掉版本号不算错，但要全篇统一。
+
+  - key: political_status
+    name: 政治面貌
+    aliases: [政治面貌]
+    normalize: text
+    severity: low
+    allowed:
+      - 中共党员
+      - 中共预备党员
+      - 共青团员
+      - 群众
+      - 民主党派
+      - 无党派人士
+      - 其他
+    note: 枚举字段用 allowed 白名单。不在白名单里的一律不当作取值，所以表头文字不会被误认成政治面貌。

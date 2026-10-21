@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>材料一致性核查报告</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1f2328;--mut:#6b7280;--line:#e5e7eb;
+--hi:#b42318;--hi-bg:#fef3f2;--md:#b54708;--md-bg:#fffaeb;--lo:#175cd3;--lo-bg:#eff8ff;--ok:#067647}
+*{box-sizing:border-box}
+body{margin:0;padding:40px 24px;background:var(--bg);color:var(--fg);
+font:15px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1040px;margin:0 auto}
+h1{font-size:24px;margin:0 0 6px}
+.meta{color:var(--mut);font-size:13px;margin-bottom:24px}
+.cards{display:flex;gap:12px;margin:0 0 28px}
+.card{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
+.card .n{font-size:26px;font-weight:600;line-height:1.2}
+.card .k{color:var(--mut);font-size:12px;margin-top:4px}
+.c-hi .n{color:var(--hi)} .c-md .n{color:var(--md)} .c-lo .n{color:var(--lo)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);
+border-radius:10px;overflow:hidden;font-size:14px}
+th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f6f7f9;font-size:12px;color:var(--mut);font-weight:600}
+tr:last-child td,tr:last-child th{border-bottom:none}
+td.num{color:var(--mut);width:38px}
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.b-high{background:var(--hi-bg);color:var(--hi)} .b-medium{background:var(--md-bg);color:var(--md)}
+.b-low{background:var(--lo-bg);color:var(--lo)}
+.t{font-weight:500} .d{color:var(--mut);font-size:13px;margin-top:6px}
+.d code,li code{background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:12.5px}
+details{margin-top:8px;font-size:13px;color:var(--mut)}
+summary{cursor:pointer;color:var(--lo)}
+.h2{font-size:17px;margin:36px 0 12px}
+td.yes{color:var(--ok);font-weight:600;text-align:center}
+td.no{color:#d0d5dd;text-align:center}
+.ok{text-align:center;color:var(--ok);padding:24px}
+</style></head><body><div class="wrap">
+<h1>材料一致性核查报告</h1>
+<div class="meta">生成于 2026-10-21 16:53 · 输入 <code>samples</code> · 3 份文件 · 13 个字段</div>
+<div class="cards">
+  <div class="card c-hi"><div class="n">5</div><div class="k">高优先级</div></div>
+  <div class="card c-md"><div class="n">0</div><div class="k">中优先级</div></div>
+  <div class="card c-lo"><div class="n">0</div><div class="k">低优先级</div></div>
+  <div class="card"><div class="n">5</div><div class="k">问题合计</div></div>
+</div>
+<table><thead><tr><th>#</th><th>级别</th><th>类型</th><th>字段</th><th>说明与证据</th></tr></thead>
+<tbody><tr class="sev-high">
+  <td class="num">1</td>
+  <td><span class="badge b-high">高</span></td>
+  <td>取值冲突</td>
+  <td><b>毕业时间</b></td>
+  <td><div class="t">「毕业时间」存在 2 个不同取值</div>
+      <div class="d">`2027-06`（1 处）：01_简历_林小舟.docx · 第 5 段<br>`2027-07`（1 处）：02_网申字段母版.md · 第 7 行</div>
+      <details><summary>全部位置（2）</summary><ul><li><code>2027.06</code> — 01_简历_林小舟.docx · 第 5 段</li><li><code>2027年7月</code> — 02_网申字段母版.md · 第 7 行</li></ul></details>
+  </td>
+</tr><tr class="sev-high">
+  <td class="num">2</td>
+  <td><span class="badge b-high">高</span></td>
+  <td>格式违规</td>
+  <td><b>手机号</b></td>
+  <td><div class="t">「手机号」有 1 处不符合声明格式</div>
+      <div class="d">约束：^1[3-9]\d{9}$</div>
+      <details><summary>全部位置（1）</summary><ul><li><code>1380001234</code> — 03_证明材料清单.md · 第 7 行</li></ul></details>
+  </td>
+</tr><tr class="sev-high">
+  <td class="num">3</td>
+  <td><span class="badge b-high">高</span></td>
+  <td>疑似笔误</td>
+  <td><b>手机号</b></td>
+  <td><div class="t">「手机号」存在 2 个不同取值，其中含高度相似的值（疑似漏字/多字）</div>
+      <div class="d">`13800001234`（2 处）：01_简历_林小舟.docx · 第 2 段；02_网申字段母版.md · 第 4 行<br>`1380001234`（1 处）：03_证明材料清单.md · 第 7 行<br>高度相似：`13800001234` ↔ `1380001234`（相似度 95%，长度不同，疑似漏字或多字）</div>
+      <details><summary>全部位置（3）</summary><ul><li><code>13800001234</code> — 01_简历_林小舟.docx · 第 2 段</li><li><code>13800001234</code> — 02_网申字段母版.md · 第 4 行</li><li><code>1380001234</code> — 03_证明材料清单.md · 第 7 行</li></ul></details>
+  </td>
+</tr><tr class="sev-high">
+  <td class="num">4</td>
+  <td><span class="badge b-high">高</span></td>
+  <td>疑似笔误</td>
+  <td><b>软著登记号</b></td>
+  <td><div class="t">「软著登记号」存在 3 个不同取值，其中含疑似数字转置</div>
+      <div class="d">`2024SR1234567`（1 处）：02_网申字段母版.md · 第 12 行<br>`2024SR1234576`（1 处）：03_证明材料清单.md · 第 5 行<br>`2025SR0484352`（1 处）：01_简历_林小舟.docx · 第 13 段<br>疑似数字转置：`2024SR1234567` ↔ `2024SR1234576`（字符组成完全相同，仅顺序不同）</div>
+      <details><summary>全部位置（3）</summary><ul><li><code>2024SR1234567</code> — 02_网申字段母版.md · 第 12 行</li><li><code>2024SR1234576</code> — 03_证明材料清单.md · 第 5 行</li><li><code>2025SR0484352</code> — 01_简历_林小舟.docx · 第 13 段</li></ul></details>
+  </td>
+</tr><tr class="sev-high">
+  <td class="num">5</td>
+  <td><span class="badge b-high">高</span></td>
+  <td>取值冲突</td>
+  <td><b>本科专业</b></td>
+  <td><div class="t">「本科专业」存在 2 个不同取值</div>
+      <div class="d">`信息管理与信息系统`（1 处）：02_网申字段母版.md · 第 9 行<br>`信息资源管理`（1 处）：01_简历_林小舟.docx · 第 18 段</div>
+      <details><summary>全部位置（2）</summary><ul><li><code>信息管理与信息系统</code> — 02_网申字段母版.md · 第 9 行</li><li><code>信息资源管理</code> — 01_简历_林小舟.docx · 第 18 段</li></ul></details>
+  </td>
+</tr></tbody></table>
+<div class="h2">字段覆盖矩阵</div>
+<table><thead><tr><th>字段</th><th>01_简历_林小舟.docx</th><th>02_网申字段母版.md</th><th>03_证明材料清单.md</th></tr></thead><tbody><tr><th>姓名</th><td class="no">·</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>手机号</th><td class="yes">Y</td><td class="yes">Y</td><td class="yes">Y</td></tr><tr><th>邮箱</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>身份证号</th><td class="no">·</td><td class="no">·</td><td class="no">·</td></tr><tr><th>出生年月</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>毕业时间</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>本科院校</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>本科专业</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>硕士院校</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>硕士专业</th><td class="yes">Y</td><td class="yes">Y</td><td class="no">·</td></tr><tr><th>软著登记号</th><td class="yes">Y</td><td class="yes">Y</td><td class="yes">Y</td></tr><tr><th>软著名称</th><td class="yes">Y</td><td class="no">·</td><td class="no">·</td></tr><tr><th>政治面貌</th><td class="yes">Y</td><td class="no">·</td><td class="no">·</td></tr></tbody></table>
+</div></body></html>

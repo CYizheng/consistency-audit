@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>材料一致性核查器 · consistency-audit</title>
+<style>
+  :root{
+    --bg:#fbfbfa; --fg:#1f2328; --mut:#6b7280; --line:#e5e7eb;
+    --hi:#b42318; --md:#b54708; --lo:#175cd3; --ok:#067647; --ink:#111827;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:56px 24px 72px;background:var(--bg);color:var(--fg);
+    font:15px/1.7 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto}
+  .tag{
+    display:inline-block;font-size:12px;letter-spacing:.06em;color:var(--mut);
+    border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:#fff;
+  }
+  h1{font-size:31px;line-height:1.25;margin:18px 0 10px;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:16px;margin:0 0 34px}
+  h2{font-size:16px;margin:40px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  p{margin:0 0 14px}
+  code{
+    background:#f3f4f6;padding:1.5px 6px;border-radius:5px;
+    font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;
+  }
+  pre{
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;overflow:auto;font:13px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;
+    color:var(--ink);
+  }
+  pre .c{color:var(--mut)}
+  .rows{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .row{background:#fff;padding:14px 16px;display:grid;grid-template-columns:132px 1fr;gap:14px}
+  .row .k{font-size:13px;color:var(--mut)}
+  .row .v{font-size:14px}
+  .v b{font-weight:600}
+  .nums{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:6px 0 4px}
+  .num{flex:1;background:#fff;padding:16px 14px;text-align:center}
+  .num .n{font-size:23px;font-weight:600;line-height:1.2}
+  .num .l{font-size:12px;color:var(--mut);margin-top:3px}
+  .acts{display:flex;gap:12px;flex-wrap:wrap;margin:34px 0 0}
+  .btn{
+    display:inline-block;padding:10px 20px;border-radius:9px;text-decoration:none;
+    font-size:14px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--fg);
+    transition:background .15s,border-color .15s;
+  }
+  .btn:hover{background:#f6f7f9}
+  .btn.primary{background:#1f2328;color:#fff;border-color:#1f2328}
+  .btn.primary:hover{background:#000}
+  footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+  a{color:var(--lo)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="tag">CLI · 纯标准库之外仅 4 个轻量依赖 · 无模型</span>
+  <h1>材料一致性核查器</h1>
+  <p class="sub">
+    同一份材料散落在简历、网申母版、报名表和证明材料里。只要有一个字段对不上——
+    登记号差一位、毕业时间写成两个月份、专业名用了近义词——档案核验时就会被判为不实填报。
+    人靠记性兜不住，这个工具把它变成一次可复现的扫描。
+  </p>
+
+  <h2>它抓什么</h2>
+  <div class="rows">
+    <div class="row"><div class="k">取值冲突</div><div class="v">简历写 <b>图书情报</b>，母版写 <b>情报学</b>——归一化后仍不同即报</div></div>
+    <div class="row"><div class="k">数字转置</div><div class="v"><code>2024SR1234567</code> 与 <code>2024SR1234576</code>：长度相同、字符组成完全相同，只是顺序不同</div></div>
+    <div class="row"><div class="k">高度相似</div><div class="v"><code>13800001234</code> 与 <code>1380001234</code>：长度不同、相似度 95%，是漏字而非转置</div></div>
+    <div class="row"><div class="k">格式违规</div><div class="v">登记号少一位、手机号 10 位——按字典里声明的正则校验</div></div>
+    <div class="row"><div class="k">字段缺失</div><div class="v">声明的必填字段在所有材料里都没出现，通常是漏页或别名没配</div></div>
+  </div>
+
+  <h2>为什么转置要单独判</h2>
+  <p>
+    <code>0484352</code> 与 <code>0484325</code> 的模糊相似度只有 <b>85%</b>。
+    用常见的 90% 阈值做近似匹配，这类错误会被<b>整批漏掉</b>；
+    而把阈值放宽到 80%，两个真实不同的编号又会互相误报。
+    所以这里换判据：<b>等长且字符频次完全相同</b>才算转置——精度和召回同时拿到。
+  </p>
+  <pre><span class="c"># 不是相似度，是字符重排</span>
+sorted("2024SR1234567") == sorted("2024SR1234576")   <span class="c">→ True</span>
+len(a) == len(b)                                    <span class="c">→ True</span></pre>
+
+  <h2>精度是在真实材料上磨出来的</h2>
+  <p>自测数据是干净的，真实材料不是。每一轮误报都对应一条可解释的判据修正，而不是放宽阈值：</p>
+  <div class="nums">
+    <div class="num"><div class="n" style="color:var(--hi)">16</div><div class="l">v1 整库扫</div></div>
+    <div class="num"><div class="n" style="color:var(--md)">10</div><div class="l">v2 缩小作用域</div></div>
+    <div class="num"><div class="n" style="color:var(--md)">8</div><div class="l">v3 分离符判据</div></div>
+    <div class="num"><div class="n" style="color:var(--lo)">2</div><div class="l">v4 前缀截取</div></div>
+    <div class="num"><div class="n" style="color:var(--lo)">1</div><div class="l">v5 白名单</div></div>
+    <div class="num"><div class="n" style="color:var(--ok)">0</div><div class="l">v6 负例前缀</div></div>
+  </div>
+  <p style="color:var(--mut);font-size:13.5px">
+    30 份真实材料、13 个口径字段。放宽阈值只会让真问题一起消失，所以每一条误报都改判据。
+  </p>
+
+  <h2>怎么用</h2>
+  <pre>pip install -r requirements.txt
+python audit.py -i 网申母版.md 简历 报名表 -x "版本说明*" --html</pre>
+  <p>
+    退出码 <code>0</code> 无高优先级问题、<code>1</code> 存在高优先级问题、<code>2</code> 参数错误，
+    可以直接接进提交前钩子——让「材料改完就核一遍」变成不需要记性的事。
+  </p>
+
+  <div class="acts">
+    <a class="btn primary" href="examples/demo_report.html">看一份示例报告 →</a>
+    <a class="btn" href="https://github.com/CYizheng/consistency-audit">源码与说明</a>
+  </div>
+
+  <footer>
+    MIT License · 示例材料与字典内信息均为虚构（林小舟，东岭大学）
+  </footer>
+
+</div>
+</body>
+</html>
